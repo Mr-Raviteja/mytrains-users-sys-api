@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="createUser" doc:id="7fd2f778-97a3-4432-8265-8e29322fb798" >
+		<db:insert doc:id="cf804610-77c3-4045-91a7-32b1c3bb5cdc" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO `trains`.`customers`
+(`userId`,
+`firstName`,
+`lastName`,
+`email`,
+`customerStatus`,
+`createdTimestamp`,
+`phone`)
+VALUES
+(<{userId: }>,
+<{firstName: }>,
+<{lastName: }>,
+<{email: }>,
+<{customerStatus: }>,
+<{createdTimestamp: }>,
+<{phone: }>);
+]]></db:sql>
+		</db:insert>
+	</flow>
+	<flow name="getAllUsers" doc:id="309d7fd4-ef82-4aad-b50e-10c625c9ddf9" >
+		<db:select doc:name="Select" doc:id="ff08506c-ad77-473d-af6c-04bd4250b504" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM customers]]></db:sql>
+		</db:select>
+	</flow>
+	<flow name="getUserbyId" doc:id="ecdb8910-6ad4-420f-840e-57398d4cf96f" >
+		<db:select doc:name="Select" doc:id="5f1b131b-f01f-4170-be39-4ec9a888e286" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM customers where userId=:userid]]></db:sql>
+			<db:input-parameters ><![CDATA[#["userid": vars.userid]]]></db:input-parameters>
+		</db:select>
+	</flow>
+	<flow name="deleteUserById" doc:id="e93006b1-7abd-40fe-86f5-828591ab1e8b" >
+		<db:delete doc:name="Delete" doc:id="5103de2e-ee35-4dd2-aff3-a1a0323baa1d" config-ref="Database_Config">
+			<db:sql ><![CDATA[DELETE FROM customers WHERE userId=:userid;
+]]></db:sql>
+		</db:delete>
+	</flow>
+	<flow name="updateUserById" doc:id="48d761ca-eeb5-402a-b3a7-339b162e1e17">
+		<db:update doc:name="Update" doc:id="e2c80332-faa6-4de7-b8cf-652914d418d0" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE `trains`.`customers`
+SET
+`firstName` = <{firstName: }>,
+`lastName` = <{lastName: }>,
+`email` = <{email: }>,
+`customerStatus` = <{customerStatus: }>,
+`createdTimestamp` = <{createdTimestamp: }>,
+`phone` = <{phone: }>
+WHERE `userId` = <{expr}>;
+]]></db:sql>
+		</db:update>
+	</flow>
+</mule>
