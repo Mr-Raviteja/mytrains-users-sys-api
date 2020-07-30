@@ -105,29 +105,30 @@ WHERE userId=:userId and subscriptionId=:subscriptionId;]]></db:sql>
 		<logger level="INFO" doc:name="Logger" doc:id="7707fb40-fedc-4e51-a69e-058b7c39c179" />
 	</flow>
 	<flow name="createSubscription" doc:id="4b648f93-b493-4906-af6b-b09e12c5ab47" >
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="244109b1-ade6-42e6-a9fe-32d8da311a8b" variableName="userId" />
 		<db:insert doc:name="Insert" doc:id="69b52d75-d8c1-40ec-bb5b-cef28680fc38" config-ref="Database_Config">
 			<db:sql ><![CDATA[INSERT INTO `trains`.`subscriptions`
 (`userId`,
 `source`,
 `destination`,
-`souceTime`,
+`sourceTime`,
 `destinationTime`,
-`reminderTime`)
+`remainderTime`)
 VALUES
 (:userId,
 :source,
 :destination,
-:souceTime,
+:sourceTime,
 :destinationTime,
-:reminderTime)]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{"userId": payload.userId,
+:remainderTime)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"userId": vars.userId,
 "source": payload.source,
 "destination": payload.destination,
-"souceTime": payload.souceTime,
+"sourceTime": payload.sourceTime,
 "destinationTime": payload.destinationTime,
-"reminderTime": payload.reminderTime}]]]></db:input-parameters>
+"remainderTime": payload.remainderTime}]]]></db:input-parameters>
 		</db:insert>
-		<logger level="INFO" doc:name="Logger" doc:id="2b4b5628-62a7-45d1-b01c-82c90af6a879" />
+		<logger level="INFO" doc:name="Logger" doc:id="2b4b5628-62a7-45d1-b01c-82c90af6a879" message="#[payload]"/>
 	</flow>
 	<flow name="getUserSubscription" doc:id="c57453e3-9642-4ef6-a75b-cdbc03eeac91" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="userId Variable" doc:id="338ca31d-4be2-41e0-bf16-ed6e8ec47620" variableName="userId" />
@@ -146,7 +147,7 @@ VALUES
 			<db:sql><![CDATA[select * FROM `trains`.`subscriptions` where userId=:userId]]></db:sql>
 			<db:input-parameters ><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
 		</db:select>
-		<logger level="INFO" doc:name="Logger" doc:id="005209f9-e66d-41f6-a4ef-a5836cb07c9a" message="#[payload]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="005209f9-e66d-41f6-a4ef-a5836cb07c9a" message="created"/>
 	</flow>
 	<flow name="updateSubscription" doc:id="8f5adbb4-fe6b-4827-9302-40160511790f" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="85be24fb-791e-4c61-9214-e43a9e181d5c" variableName="userId" />

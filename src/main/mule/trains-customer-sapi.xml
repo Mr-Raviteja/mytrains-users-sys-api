@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-  
-    <apikit:config name="trains-customer-sapi-config" api="resource::18214c51-423a-4c66-aa63-4bb1f9c554f7:trains-customer-sapi:1.0.2:raml:zip:trains-customer-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    <apikit:config name="trains-customer-sapi-config" api="resource::18214c51-423a-4c66-aa63-4bb1f9c554f7:trains-customer-sapi:1.0.3:raml:zip:trains-customer-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <flow name="trains-customer-sapi-main">
-        <http:listener doc:name="Listener" doc:id="60ebcd23-10a3-4b4a-b4c5-43387e1cd6f1" config-ref="trains-customer-sapi-httpListenerConfig" path="/api/*"/>
-		<apikit:router config-ref="trains-customer-sapi-config" />
+        <http:listener config-ref="trains-customer-sapi-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="trains-customer-sapi-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
                 <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
@@ -114,55 +120,74 @@ output application/json
             </on-error-propagate>
         </error-handler>
     </flow>
-    <flow name="put:\users\user\(userId)\subscriptions\subscriber\(subscriptionID):application\json:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="304296fa-9b3f-4aef-8ac1-620b29beed1e" name="updateSubscription"/>
+    <flow name="put:\users\user\(userId)\subscriptions\subscriber\(subscriptionId):application\json:trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="48213443-a9d1-422a-b414-69054775cb9d" name="updateSubscription"/>
     </flow>
-    <flow name="delete:\users\user\(userId)\subscriptions\subscriber\(subscriptionID):trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="78747b0f-8e73-4a9a-b19c-e1b215ec0486" name="get:\users\user\(userId)\subscriptions:trains-customer-sapi-config"/>
+    <flow name="delete:\users\user\(userId)\subscriptions\subscriber\(subscriptionId):trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="3b9b900c-413b-4111-9476-d940aec4a511" name="deleteSubscription"/>
     </flow>
     <flow name="delete:\users\user\(userId):trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="361a280f-9b52-457d-a3af-868dabc150e0" name="deleteUserById"/>
+		<flow-ref doc:name="Flow Reference" doc:id="8790caf2-1609-420d-b884-803d731fd5e1" name="deleteUserById"/>
     </flow>
     <flow name="patch:\users\user\(userId):application\json:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="7cef5b19-e4f1-404e-998d-b08ebca2d594" name="updateUserById"/>
+		<flow-ref doc:name="Flow Reference" doc:id="69c1aeb6-0d8e-43bf-9d36-ee11c674953b" name="updateUserById"/>
     </flow>
     <flow name="get:\users\user\(userId)\notifications:trains-customer-sapi-config">
-    </flow>
-    <flow name="get:\users\user\(userId)\subscriptions\subscriber\(subscriptionID):trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="9f9e1d59-6196-43b2-84a2-f774c6d7f28f" name="getUserSubscription"/>
-    </flow>
-    <flow name="get:\users\subscriptions:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="f3d084f4-2177-4503-954b-34e9aef5b4ca" name="getAllSubscriptions"/>
-    </flow>
-    <flow name="get:\users\user\(userId)\subscriptions:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="81d6deae-e8ae-43ed-84aa-1ab649b8fc20" name="getAllSubscriptionsByUser"/>
-    </flow>
-    <flow name="get:\users\user\(userId):trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="af2a36f2-557a-454c-89ee-d4a1fc7cd342" name="getUserbyId"/>
-		<ee:transform doc:name="Transform Message" doc:id="e0562f25-9d9d-43d7-9627-9a57814a2f01" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	userId: payload.userId,
-	firstName: payload.firstName,
-	lastName: payload.lastName,
-	phone: payload.phone,
-	emailId: payload.email
-	
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-    </flow>
-    <flow name="get:\users:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="365b69cd-31f4-4f02-a231-66b3f2177b38" name="getAllUsers"/>
-    </flow>
-    <flow name="get:\users\user\(userId)\notifications\(notificationsID):trains-customer-sapi-config">
         <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
             <ee:variables>
                 <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-                <ee:set-variable variableName="notificationsID">attributes.uriParams.'notificationsID'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+[
+  {
+    notificationId: "6318",
+    userId: "jh566f",
+    subscriptionId: "45",
+    sourceStation: "Liverpool",
+    destinationStation: "Cambridge",
+    trainName: "National trian-2465",
+    actualTime: "2016-02-28T16:41:41.090Z",
+    estimatedTime: "2016-02-28T17:41:41.090Z"
+  }, 
+  {
+    notificationId: "6319",
+    userId: "jh566f",
+    subscriptionId: "45",
+    sourceStation: "Liverpool",
+    destinationStation: "Cambridge",
+    trainName: "National trian-2465",
+    actualTime: "2016-02-28T16:41:41.090Z",
+    estimatedTime: "2016-02-28T17:41:41.090Z"
+  }
+]]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="get:\users\user\(userId)\subscriptions\subscriber\(subscriptionId):trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="befb3e7d-7108-4d0b-9e69-dd99148cc613" name="getUserSubscription"/>
+    </flow>
+    <flow name="get:\users\subscriptions:trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="4cd9127f-53c7-462f-ac04-db8e3450e7ae" name="getAllSubscriptions"/>
+    </flow>
+    <flow name="get:\users\user\(userId)\subscriptions:trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="c5f14054-1bdc-4850-bb92-b5c2a1a9ca9d" name="getAllSubscriptionsByUser"/>
+    </flow>
+    <flow name="get:\users\user\(userId):trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="9c4e687b-3a55-4e36-9289-0d68fa334b5c" name="getUserbyId"/>
+    </flow>
+    <flow name="get:\users:trains-customer-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="fa9effc9-57c5-4904-a2e4-47b37e14d93b" name="getAllUsers"/>
+    </flow>
+    <flow name="get:\users\user\(userId)\notifications\(notificationsId):trains-customer-sapi-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
+                <ee:set-variable variableName="notificationsId">attributes.uriParams.'notificationsId'</ee:set-variable>
             </ee:variables>
         </ee:transform>
         <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
@@ -172,6 +197,8 @@ output application/json
 ---
 {
   notificationId: "6318",
+  userId: "jh566f",
+  subscriptionId: "45",
   sourceStation: "Liverpool",
   destinationStation: "Cambridge",
   trainName: "National trian-2465",
@@ -182,9 +209,9 @@ output application/json
         </ee:transform>
     </flow>
     <flow name="post:\users\registrations:application\json:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="fce4c14b-b385-4440-91a8-4161fe8d122b" name="createUser"/>
+		<flow-ref doc:name="Flow Reference" doc:id="a0fbffd1-ec80-434a-b198-0cd1685d244f" name="createUser"/>
     </flow>
     <flow name="post:\users\user\(userId)\subscriptions\subscribe:application\json:trains-customer-sapi-config">
-		<flow-ref doc:name="Flow Reference" doc:id="c1b6b3a6-5f71-4e23-b687-0d85c6da322f" name="createSubscription"/>
+		<flow-ref doc:name="Flow Reference" doc:id="d7aad37c-0681-4e0b-81e5-60ffc41de93c" name="createSubscription"/>
     </flow>
 </mule>
