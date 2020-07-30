@@ -9,7 +9,7 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 	  <http:listener-config name="trains-customer-sapi-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8081" />
     </http:listener-config>
-	<configuration-properties doc:name="Configuration properties" doc:id="21321051-9aa7-4c55-9f7c-e24ad648a12c" file="config-properties.yaml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="21321051-9aa7-4c55-9f7c-e24ad648a12c" file="mytrains.user.sys.api.dev.yaml" />
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="96e6187e-13c3-48d7-b3cf-8605dca3ffc4" >
 		<db:my-sql-connection host="${mysql.host}" port="${mysql.port}" user="${mysql.user}" password="${mysql.password}" database="${mysql.database}" />
 	</db:config>
