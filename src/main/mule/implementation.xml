@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="createUser" doc:id="7fd2f778-97a3-4432-8265-8e29322fb798" >
 		<db:insert doc:id="cf804610-77c3-4045-91a7-32b1c3bb5cdc" config-ref="Database_Config">
 			<db:sql ><![CDATA[INSERT INTO `trains`.`customers`
@@ -11,49 +12,145 @@ http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/cu
 `firstName`,
 `lastName`,
 `email`,
-`customerStatus`,
-`createdTimestamp`,
 `phone`)
 VALUES
-(<{userId: }>,
-<{firstName: }>,
-<{lastName: }>,
-<{email: }>,
-<{customerStatus: }>,
-<{createdTimestamp: }>,
-<{phone: }>);
-]]></db:sql>
+(:userId,
+:firstName ,
+:lastName,
+:email,
+:phone )]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"userId": payload.userId,
+"firstName": payload.firstName,
+"lastName": payload.lastName,
+"email": payload.emailId,
+"phone": payload.phone}]]]></db:input-parameters>
 		</db:insert>
+		<logger level="INFO" doc:name="Logger" doc:id="bec0b992-b2e7-43dc-bd0f-8d8006c52680" message="#[payload]"/>
 	</flow>
 	<flow name="getAllUsers" doc:id="309d7fd4-ef82-4aad-b50e-10c625c9ddf9" >
 		<db:select doc:name="Select" doc:id="ff08506c-ad77-473d-af6c-04bd4250b504" config-ref="Database_Config">
 			<db:sql ><![CDATA[SELECT * FROM customers]]></db:sql>
 		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="10f4a71f-efd8-474e-b02d-ac6066fd65fe" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	userId: payload01.userId,
+	firstName: payload01.firstName,
+	lastName: payload01.lastName,
+	phone: payload01.phone,
+	emailId: payload01.email,
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="81e7959d-7070-4101-8eb9-145ad7390b50" message="#[payload]" />
 	</flow>
 	<flow name="getUserbyId" doc:id="ecdb8910-6ad4-420f-840e-57398d4cf96f" >
 		<db:select doc:name="Select" doc:id="5f1b131b-f01f-4170-be39-4ec9a888e286" config-ref="Database_Config">
 			<db:sql ><![CDATA[SELECT * FROM customers where userId=:userid]]></db:sql>
 			<db:input-parameters ><![CDATA[#["userid": vars.userid]]]></db:input-parameters>
 		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="852cb99f-a1fa-4a03-989d-61531bffbfc7" message="#[payload]"/>
 	</flow>
 	<flow name="deleteUserById" doc:id="e93006b1-7abd-40fe-86f5-828591ab1e8b" >
-		<db:delete doc:name="Delete" doc:id="5103de2e-ee35-4dd2-aff3-a1a0323baa1d" config-ref="Database_Config">
-			<db:sql ><![CDATA[DELETE FROM customers WHERE userId=:userid;
-]]></db:sql>
-		</db:delete>
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set Variable" doc:id="2c0ea8f5-4afd-4757-a5f0-9b7c5b4dfa51" variableName="userId" />
+		<db:update doc:name="Update" doc:id="2c9d46a2-2e3c-410b-98b7-6a7d97576ffc" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE `trains`.`customers`
+SET
+customerStatus=2
+where userId=:userId]]></db:sql>
+			<db:input-parameters ><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="9de28218-debb-4653-8108-d184f56ebb2b" message="#[payload]"/>
 	</flow>
 	<flow name="updateUserById" doc:id="48d761ca-eeb5-402a-b3a7-339b162e1e17">
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set Variable" doc:id="2aa28148-1e9f-4a61-8bf5-f402ce5e7e44" variableName="userId"/>
 		<db:update doc:name="Update" doc:id="e2c80332-faa6-4de7-b8cf-652914d418d0" config-ref="Database_Config">
 			<db:sql ><![CDATA[UPDATE `trains`.`customers`
 SET
-`firstName` = <{firstName: }>,
-`lastName` = <{lastName: }>,
-`email` = <{email: }>,
-`customerStatus` = <{customerStatus: }>,
-`createdTimestamp` = <{createdTimestamp: }>,
-`phone` = <{phone: }>
-WHERE `userId` = <{expr}>;
+`firstName` = :firstName,
+`lastName` = :lastName,
+`email` = :email,
+`phone` =:phone,
+WHERE `userId` =:userid;
 ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"userid": vars.userId,
+"firstName": payload.firstName,
+"lastName": payload.lastName,
+"email": payload.emailId,
+"phone": payload.phone}]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="b9aad3bf-39e0-4be8-ab50-2e3df08f46a2" message="#[payload]"/>
+	</flow>
+	<flow name="deleteSubscription" doc:id="39e8bdbc-1f75-4f51-b0f3-a03b756a0550" >
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="bda84d86-9a7e-4b57-8640-74544c199ffb" variableName="userId" />
+		<set-variable value="#[message.attributes.uriParams.subscriptionId]" doc:name="Set subscriptionId Variable" doc:id="4080cccf-273b-4cae-b1d4-6ed3d4601679" variableName="subscriptionId" />
+		<db:update doc:name="Update" doc:id="7284aac5-8226-4246-bb01-d361cb03394e" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE `trains`.`subscriptions` s
+SET `subscriptionStatus` = 3
+WHERE userId=:userId and subscriptionId=:subscriptionId;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"subscriptionId": vars.subscriptionId,
+"userId": vars.userId
+}]]]></db:input-parameters>
+		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="5ccb9b47-1ca3-48ca-866f-66942b0f67b5" message="#[payload]"/>
+	</flow>
+	<flow name="getAllSubscriptions" doc:id="84100ddc-10a9-4f8c-bd2b-616e8fe8bd6a" >
+		<db:select doc:name="Select" doc:id="a358b5f3-ee1b-4297-aff9-6a2250bfe33e" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT  * FROM `trains`.`subscriptions`]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="7707fb40-fedc-4e51-a69e-058b7c39c179" />
+	</flow>
+	<flow name="createSubscription" doc:id="4b648f93-b493-4906-af6b-b09e12c5ab47" >
+		<db:insert doc:name="Insert" doc:id="69b52d75-d8c1-40ec-bb5b-cef28680fc38" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO `trains`.`subscriptions`
+(`userId`,
+`source`,
+`destination`,
+`souceTime`,
+`destinationTime`,
+`reminderTime`)
+VALUES
+(:userId,
+:source,
+:destination,
+:souceTime,
+:destinationTime,
+:reminderTime)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"userId": payload.userId,
+"source": payload.source,
+"destination": payload.destination,
+"souceTime": payload.souceTime,
+"destinationTime": payload.destinationTime,
+"reminderTime": payload.reminderTime}]]]></db:input-parameters>
+		</db:insert>
+		<logger level="INFO" doc:name="Logger" doc:id="2b4b5628-62a7-45d1-b01c-82c90af6a879" />
+	</flow>
+	<flow name="getSubscriptionsByUser" doc:id="ca718835-f905-4dfb-b0d2-94777b4b1183" >
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="5d661014-9ca6-4243-b766-e48161c90595" variableName="userId" />
+		<db:select doc:name="Select" doc:id="ea038e24-a523-4122-816f-62611ac568ee" config-ref="Database_Config">
+			<db:sql><![CDATA[select * FROM `trains`.`subscriptions` where userId=:userId]]></db:sql>
+			<db:input-parameters ><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
+		</db:select>
+	</flow>
+	<flow name="updateSubscription" doc:id="8f5adbb4-fe6b-4827-9302-40160511790f" >
+		<db:update doc:name="Update" doc:id="fa410cee-7f03-448e-83eb-0688ce410b9a" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE `trains`.`subscriptions`
+SET
+`source` = :source,
+`destination` = :destination,
+`souceTime` = :souceTime,
+`destinationTime` =:destinationTime,
+`reminderTime` = :reminderTime,
+WHERE `subscriptionId` =:subscriptionId ;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"source": payload.source,
+"destination": payload.destination,
+"souceTime": payload.souceTime,
+"destinationTime": payload.destinationTime,
+"reminderTime": payload.reminderTime}]]]></db:input-parameters>
 		</db:update>
 	</flow>
 </mule>

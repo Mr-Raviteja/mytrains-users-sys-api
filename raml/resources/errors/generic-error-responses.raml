@@ -1,0 +1,39 @@
+#%RAML 1.0 Trait
+
+responses:
+  
+  400:
+    body:
+      application/json:
+        example: 
+            message: Error creating accounts. Please check the JSON object and make sure it's valid
+  401:
+    body:
+      application/json:
+        example: 
+          message: Unauthorized
+  403:
+    body:
+      application/json:
+        example: 
+          message: Forbidden.
+  404:
+    body:
+      application/json:
+        example: 
+          message: Page Not Found.
+  500:
+    body:
+      application/json:
+        example: 
+          message: Internal Server Error.
+  502:
+    body:
+      application/json:
+        example:
+          mesaage: Bad Gateway
+  503:
+    body:
+      application/json:
+        example:
+          message:  Service Unavailable

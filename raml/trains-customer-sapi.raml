@@ -1,0 +1,190 @@
+#%RAML 1.0
+title: trains-customer-sapi
+description: This a system API which connects to MySql Database
+version: v1
+
+traits:
+  error-responses: !include resources/errors/generic-error-responses.raml
+
+types:
+  Customer: !include resources/datatypes/customer-datatype.raml
+  Subscription: !include resources/datatypes/subscription-datatype.raml
+  Notification: !include resources/datatypes/notification-datatype.raml
+/users:
+  
+  get:
+    displayName: Get All customer
+    description: Retrieves a list of all customers
+    responses:
+      200:
+        description: Success
+        body:
+          application/json:
+            type: Customer[]
+            example: !include resources/examples/customers-array-example.raml
+    is: [error-responses]
+  /registrations:          
+    post:
+      displayName: Add Customer
+      description: Creates/Adds a new Account for the customer
+      body:
+        application/json:
+          description: Payload should be an object with all fields present for each Account object.
+          type: Customer   
+          examples: !include resources/examples/customer-no-id-example.raml
+      responses:
+        201:
+          description: Success
+          body:
+            application/json:
+              example:
+                message: Accounts created (but not really)
+      is: [error-responses]
+  /user/{userId}:
+    get:
+      description: get customer details by userID
+      responses:
+        200:
+          body:
+            application/json:
+              type: Customer
+              examples: !include resources/examples/customer-example.raml
+      is:
+        - error-responses:
+          
+      
+          
+    delete:
+      description: delete customer details from db records which is deactive his account
+      responses:
+        200:
+          description: account deactivated successfully
+          body:
+            application/json:
+              examples:
+                message: account deactivated successfully (but not really)
+      is:
+        - error-responses:
+          
+    patch:
+      description: update a small amount of resource by id
+      body:
+        application/json:
+          type: Customer
+          examples:
+            !include resources/examples/customer-example.raml
+      responses:
+        200:
+          description: resource updated successfully
+          body:
+            application/json:
+              examples:
+                message: updated details successfully (but not really)
+      is:
+        - error-responses:
+          
+    /subscriptions:
+      get:
+        description: get all user's subscriptions
+        responses:
+          200:
+            body:
+              application/json:
+                type: Subscription[]
+                example: !include resources/examples/subscription-array-example.raml
+        is:
+          - error-responses:
+      /subscribe:      
+        post:
+          description: user subscribs
+          body:
+            application/json:
+              type: Subscription
+              example: !include resources/examples/subcription-no-id-example.raml
+          responses:
+            201:
+              body:
+                application/json:
+                  example:
+                    message: subscribed successfully
+          is:
+            - error-responses:
+      /subscriber/{subscriptionID}:
+        get:
+          description: get subscription by id
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Subscription
+                  example: !include resources/examples/subscription-example.raml
+          is:
+            - error-responses:
+        put:
+          description: update subscrition
+          body:
+            application/json:
+              type: Subscription
+              example: !include resources/examples/subscription-example.raml
+          responses:
+            200:
+              body:
+                application/json:
+                  example:
+                    message: updated successfully
+          is:
+            - error-responses:
+                    
+        delete:
+          description: unsubscribe
+          responses:
+            200:
+              body:
+                application/json:
+                  example:
+                    message: unsubscribed successfully
+          is:
+            - error-responses:
+    /notifications:
+      get:
+        description: get all notifications of a user
+        responses:
+          200:
+            body:
+              application/json:
+                type: Notification[]
+                examples:  !include resources/examples/notification-array-example.raml
+        is:
+          - error-responses:          
+      /{notificationsID}: 
+        get:
+          description: get notification of a user by notification ID
+          responses:
+            200:
+              body:
+                application/json:
+                  type: Notification
+                  examples: !include resources/examples/notification-example.raml
+          is:
+              - error-responses:
+                  
+  /subscriptions:
+    description: user subscription
+    get:
+      description: get all users subscriptions
+      responses:
+        200:
+          body:
+            application/json:
+              type: Subscription[]
+              example: !include resources/examples/subscription-array-example.raml
+      is:
+        - error-responses
+    
+    
+                  
+            
+                
+      
+
+    
