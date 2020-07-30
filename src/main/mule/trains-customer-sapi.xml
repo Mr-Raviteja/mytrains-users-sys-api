@@ -115,42 +115,10 @@ output application/json
         </error-handler>
     </flow>
     <flow name="put:\users\user\(userId)\subscriptions\subscriber\(subscriptionID):application\json:trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
-            <ee:variables>
-                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-                <ee:set-variable variableName="subscriptionID">attributes.uriParams.'subscriptionID'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  message: "updated successfully"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
-		<set-variable value="#[message.attributes.uriParams]" doc:name="userID" doc:id="58c46055-46b2-43d5-8bd2-02c9e5ca6b35" variableName="userid"/>
+		<flow-ref doc:name="Flow Reference" doc:id="304296fa-9b3f-4aef-8ac1-620b29beed1e" name="updateSubscription"/>
     </flow>
     <flow name="delete:\users\user\(userId)\subscriptions\subscriber\(subscriptionID):trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
-            <ee:variables>
-                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-                <ee:set-variable variableName="subscriptionID">attributes.uriParams.'subscriptionID'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  message: "unsubscribed successfully"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
-		<set-variable value="#[message.attributes.uriParams]" doc:name="UserID" doc:id="40336485-d7ec-4f96-ad02-7e2e4308d238" variableName="userid"/>
+		<flow-ref doc:name="Flow Reference" doc:id="78747b0f-8e73-4a9a-b19c-e1b215ec0486" name="get:\users\user\(userId)\subscriptions:trains-customer-sapi-config"/>
     </flow>
     <flow name="delete:\users\user\(userId):trains-customer-sapi-config">
 		<flow-ref doc:name="Flow Reference" doc:id="361a280f-9b52-457d-a3af-868dabc150e0" name="deleteUserById"/>
@@ -159,123 +127,15 @@ output application/json
 		<flow-ref doc:name="Flow Reference" doc:id="7cef5b19-e4f1-404e-998d-b08ebca2d594" name="updateUserById"/>
     </flow>
     <flow name="get:\users\user\(userId)\notifications:trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
-            <ee:variables>
-                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-[
-  {
-    notificationId: "6318",
-    sourceStation: "Liverpool",
-    destinationStation: "Cambridge",
-    trainName: "National trian-2465",
-    actualTime: "2016-02-28T16:41:41.090Z",
-    estimatedTime: "2016-02-28T17:41:41.090Z"
-  }, 
-  {
-    notificationId: "6319",
-    sourceStation: "Liverpool",
-    destinationStation: "Cambridge",
-    trainName: "National trian-2465",
-    actualTime: "2016-02-28T16:41:41.090Z",
-    estimatedTime: "2016-02-28T17:41:41.090Z"
-  }
-]]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
     </flow>
     <flow name="get:\users\user\(userId)\subscriptions\subscriber\(subscriptionID):trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
-            <ee:variables>
-                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-                <ee:set-variable variableName="subscriptionID">attributes.uriParams.'subscriptionID'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  subscription: "1254",
-  customerId: "12",
-  source: "cambridge",
-  destination: "Liverpool",
-  sourceTime: "2016-02-28T12:41:41.090Z",
-  destinationTime: "2016-02-28T16:41:41.090Z",
-  remainderTime: "00:30:00"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="9f9e1d59-6196-43b2-84a2-f774c6d7f28f" name="getUserSubscription"/>
     </flow>
     <flow name="get:\users\subscriptions:trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-[
-  {
-    subscription: "1254",
-    customerId: "12",
-    source: "cambridge",
-    destination: "Liverpool",
-    sourceTime: "2016-02-28T12:41:41.090Z",
-    destinationTime: "2016-02-28T16:41:41.090Z",
-    remainderTime: "00:30:00"
-  }, 
-  {
-    subscription: "1254",
-    customerId: "12",
-    source: "cambridge",
-    destination: "Liverpool",
-    sourceTime: "2016-02-28T12:41:41.090Z",
-    destinationTime: "2016-02-28T16:41:41.090Z",
-    remainderTime: "00:30:00"
-  }
-]]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="f3d084f4-2177-4503-954b-34e9aef5b4ca" name="getAllSubscriptions"/>
     </flow>
     <flow name="get:\users\user\(userId)\subscriptions:trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
-            <ee:variables>
-                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-[
-  {
-    subscription: "1254",
-    customerId: "12",
-    source: "cambridge",
-    destination: "Liverpool",
-    sourceTime: "2016-02-28T12:41:41.090Z",
-    destinationTime: "2016-02-28T16:41:41.090Z",
-    remainderTime: "00:30:00"
-  }, 
-  {
-    subscription: "1254",
-    customerId: "12",
-    source: "cambridge",
-    destination: "Liverpool",
-    sourceTime: "2016-02-28T12:41:41.090Z",
-    destinationTime: "2016-02-28T16:41:41.090Z",
-    remainderTime: "00:30:00"
-  }
-]]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="81d6deae-e8ae-43ed-84aa-1ab649b8fc20" name="getAllSubscriptionsByUser"/>
     </flow>
     <flow name="get:\users\user\(userId):trains-customer-sapi-config">
 		<flow-ref doc:name="Flow Reference" doc:id="af2a36f2-557a-454c-89ee-d4a1fc7cd342" name="getUserbyId"/>
@@ -325,20 +185,6 @@ output application/json
 		<flow-ref doc:name="Flow Reference" doc:id="fce4c14b-b385-4440-91a8-4161fe8d122b" name="createUser"/>
     </flow>
     <flow name="post:\users\user\(userId)\subscriptions\subscribe:application\json:trains-customer-sapi-config">
-        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
-            <ee:variables>
-                <ee:set-variable variableName="userId">attributes.uriParams.'userId'</ee:set-variable>
-            </ee:variables>
-        </ee:transform>
-		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
-            <ee:message>
-                <ee:set-payload><![CDATA[%dw 2.0
-output application/json
----
-{
-  message: "subscribed successfully"
-}]]></ee:set-payload>
-            </ee:message>
-        </ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="c1b6b3a6-5f71-4e23-b687-0d85c6da322f" name="createSubscription"/>
     </flow>
 </mule>

@@ -129,14 +129,28 @@ VALUES
 		</db:insert>
 		<logger level="INFO" doc:name="Logger" doc:id="2b4b5628-62a7-45d1-b01c-82c90af6a879" />
 	</flow>
-	<flow name="getSubscriptionsByUser" doc:id="ca718835-f905-4dfb-b0d2-94777b4b1183" >
+	<flow name="getUserSubscription" doc:id="c57453e3-9642-4ef6-a75b-cdbc03eeac91" >
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="userId Variable" doc:id="338ca31d-4be2-41e0-bf16-ed6e8ec47620" variableName="userId" />
+		<set-variable value="#[message.attributes.uriParams.subscriptionId]" doc:name="Set subscriptionId Variable" doc:id="a1cb457b-1e80-4bc0-8b83-85979913ea49" variableName="subscriptionId" />
+		<db:select doc:name="Select" doc:id="47af6685-117b-4993-b288-324d8c218d69" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * FROM `trains`.`subscriptions` where userId=:userId and subscriptionId=:subscriptionId]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"userId":vars.userId,
+	"subscriptionId": vars.subscriptionId
+}]]]></db:input-parameters>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="540dfed3-eafb-47e3-98ac-5e094deada5b" message="#[payload]"/>
+	</flow>
+	<flow name="getAllSubscriptionsByUser" doc:id="ca718835-f905-4dfb-b0d2-94777b4b1183" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="5d661014-9ca6-4243-b766-e48161c90595" variableName="userId" />
 		<db:select doc:name="Select" doc:id="ea038e24-a523-4122-816f-62611ac568ee" config-ref="Database_Config">
 			<db:sql><![CDATA[select * FROM `trains`.`subscriptions` where userId=:userId]]></db:sql>
 			<db:input-parameters ><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
 		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="005209f9-e66d-41f6-a4ef-a5836cb07c9a" message="#[payload]"/>
 	</flow>
 	<flow name="updateSubscription" doc:id="8f5adbb4-fe6b-4827-9302-40160511790f" >
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="85be24fb-791e-4c61-9214-e43a9e181d5c" variableName="userId" />
+		<set-variable value="#[message.attributes.uriParams.subscriptionId]" doc:name="Set subscriptionId Variable" doc:id="b85aaa75-cb07-409b-a0a5-a027ae7763ea" variableName="subscriptionId" />
 		<db:update doc:name="Update" doc:id="fa410cee-7f03-448e-83eb-0688ce410b9a" config-ref="Database_Config">
 			<db:sql ><![CDATA[UPDATE `trains`.`subscriptions`
 SET
@@ -145,12 +159,15 @@ SET
 `souceTime` = :souceTime,
 `destinationTime` =:destinationTime,
 `reminderTime` = :reminderTime,
-WHERE `subscriptionId` =:subscriptionId ;]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{"source": payload.source,
+WHERE userId=:userId  `subscriptionId` =:subscriptionId ;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{"userId": vars.userId,
+"subscription": vars.subscriptionId,
+"source": payload.source,
 "destination": payload.destination,
 "souceTime": payload.souceTime,
 "destinationTime": payload.destinationTime,
 "reminderTime": payload.reminderTime}]]]></db:input-parameters>
 		</db:update>
+		<logger level="INFO" doc:name="Logger" doc:id="19d7f764-fa6c-4694-9290-2bf191e9e800" message="#[payload]"/>
 	</flow>
 </mule>
