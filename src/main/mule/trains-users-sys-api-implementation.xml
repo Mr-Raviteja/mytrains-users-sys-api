@@ -49,10 +49,26 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 		<logger level="INFO" doc:name="Logger" doc:id="81e7959d-7070-4101-8eb9-145ad7390b50" message="#[payload]" />
 	</flow>
 	<flow name="getUserbyId" doc:id="ecdb8910-6ad4-420f-840e-57398d4cf96f" >
+		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set Variable" doc:id="394737c5-7b89-4a89-bd2c-8502d2832b42" variableName="userId" />
 		<db:select doc:name="Select" doc:id="5f1b131b-f01f-4170-be39-4ec9a888e286" config-ref="Database_Config">
-			<db:sql ><![CDATA[SELECT * FROM customers where userId=:userid]]></db:sql>
-			<db:input-parameters ><![CDATA[#["userid": vars.userid]]]></db:input-parameters>
+			<db:sql><![CDATA[SELECT * FROM customers where userId=:userId]]></db:sql>
+			<db:input-parameters><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
 		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="9c4f53d9-a526-463f-83ce-bac984c84dc1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	userId: payload01.userId,
+	firstName: payload01.firstName,
+	lastName: payload01.lastName,
+	phone: payload01.phone,
+	emailId: payload01.email,
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="852cb99f-a1fa-4a03-989d-61531bffbfc7" message="#[payload]"/>
 	</flow>
 	<flow name="deleteUserById" doc:id="e93006b1-7abd-40fe-86f5-828591ab1e8b" >
@@ -73,14 +89,14 @@ where userId=:userId]]></db:sql>
 SET
 `firstName` = :firstName,
 `lastName` = :lastName,
-`email` = :email,
-`phone` =:phone,
-WHERE `userId` =:userid;
+`email` = :emailId,
+`phone` =:phone
+WHERE `userId` = :userId
 ]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{"userid": vars.userId,
+			<db:input-parameters ><![CDATA[#[{"userId": vars.userId,
 "firstName": payload.firstName,
 "lastName": payload.lastName,
-"email": payload.emailId,
+"emailId": payload.emailId,
 "phone": payload.phone}]]]></db:input-parameters>
 		</db:update>
 		<logger level="INFO" doc:name="Logger" doc:id="b9aad3bf-39e0-4be8-ab50-2e3df08f46a2" message="#[payload]"/>
@@ -91,7 +107,7 @@ WHERE `userId` =:userid;
 		<db:update doc:name="Update" doc:id="7284aac5-8226-4246-bb01-d361cb03394e" config-ref="Database_Config">
 			<db:sql ><![CDATA[UPDATE `trains`.`subscriptions` s
 SET `subscriptionStatus` = 3
-WHERE userId=:userId and subscriptionId=:subscriptionId;]]></db:sql>
+WHERE userId=:userId and subscriptionId=:subscriptionId]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{"subscriptionId": vars.subscriptionId,
 "userId": vars.userId
 }]]]></db:input-parameters>
