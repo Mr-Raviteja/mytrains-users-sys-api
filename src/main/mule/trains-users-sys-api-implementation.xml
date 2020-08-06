@@ -105,8 +105,8 @@ WHERE `userId` = :userId
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="bda84d86-9a7e-4b57-8640-74544c199ffb" variableName="userId" />
 		<set-variable value="#[message.attributes.uriParams.subscriptionId]" doc:name="Set subscriptionId Variable" doc:id="4080cccf-273b-4cae-b1d4-6ed3d4601679" variableName="subscriptionId" />
 		<db:update doc:name="Update" doc:id="7284aac5-8226-4246-bb01-d361cb03394e" config-ref="Database_Config">
-			<db:sql ><![CDATA[UPDATE `trains`.`subscriptions` s
-SET `subscriptionStatus` = 3
+			<db:sql ><![CDATA[UPDATE `trains`.`subscriptions`
+SET `subscriptionStatus` = 4
 WHERE userId=:userId and subscriptionId=:subscriptionId]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{"subscriptionId": vars.subscriptionId,
 "userId": vars.userId
@@ -176,7 +176,7 @@ SET
 `souceTime` = :souceTime,
 `destinationTime` =:destinationTime,
 `reminderTime` = :reminderTime,
-WHERE userId=:userId  `subscriptionId` =:subscriptionId ;]]></db:sql>
+WHERE userId=:userId  `subscriptionId` =:subscriptionId ]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{"userId": vars.userId,
 "subscription": vars.subscriptionId,
 "source": payload.source,
