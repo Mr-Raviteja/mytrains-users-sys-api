@@ -19,7 +19,10 @@ VALUES
 :lastName,
 :email,
 :phone )]]></db:sql>
-			<db:input-parameters ><![CDATA[#[{"userId": payload.userId,
+			<db:input-parameters ><![CDATA[#[%dw 2.0
+ --- 
+{
+"userId": payload.userId,
 "firstName": payload.firstName,
 "lastName": payload.lastName,
 "email": payload.emailId,
@@ -118,7 +121,15 @@ WHERE userId=:userId and subscriptionId=:subscriptionId]]></db:sql>
 		<db:select doc:name="Select" doc:id="a358b5f3-ee1b-4297-aff9-6a2250bfe33e" config-ref="Database_Config">
 			<db:sql ><![CDATA[SELECT  * FROM `trains`.`subscriptions`]]></db:sql>
 		</db:select>
-		<logger level="INFO" doc:name="Logger" doc:id="7707fb40-fedc-4e51-a69e-058b7c39c179" />
+		<ee:transform doc:name="Transform Message" doc:id="e30dd522-114e-4f69-8dda-ae3731e3300e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7707fb40-fedc-4e51-a69e-058b7c39c179" message="#[payload]"/>
 	</flow>
 	<flow name="createSubscription" doc:id="4b648f93-b493-4906-af6b-b09e12c5ab47" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="244109b1-ade6-42e6-a9fe-32d8da311a8b" variableName="userId" />
@@ -155,6 +166,14 @@ VALUES
 	"subscriptionId": vars.subscriptionId
 }]]]></db:input-parameters>
 		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="b4457a50-a2d7-4bf7-b44a-3a63effada13" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="540dfed3-eafb-47e3-98ac-5e094deada5b" message="#[payload]"/>
 	</flow>
 	<flow name="getAllSubscriptionsByUser" doc:id="ca718835-f905-4dfb-b0d2-94777b4b1183" >
@@ -163,7 +182,15 @@ VALUES
 			<db:sql><![CDATA[select * FROM `trains`.`subscriptions` where userId=:userId]]></db:sql>
 			<db:input-parameters ><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
 		</db:select>
-		<logger level="INFO" doc:name="Logger" doc:id="005209f9-e66d-41f6-a4ef-a5836cb07c9a" message="created"/>
+		<ee:transform doc:name="Transform Message" doc:id="fca70862-a1c7-4637-aca8-cad7ccdde1e1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="005209f9-e66d-41f6-a4ef-a5836cb07c9a" message="#[payload]"/>
 	</flow>
 	<flow name="updateSubscription" doc:id="8f5adbb4-fe6b-4827-9302-40160511790f" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="85be24fb-791e-4c61-9214-e43a9e181d5c" variableName="userId" />
@@ -176,9 +203,9 @@ SET
 `souceTime` = :souceTime,
 `destinationTime` =:destinationTime,
 `reminderTime` = :reminderTime,
-WHERE userId=:userId  `subscriptionId` =:subscriptionId ]]></db:sql>
+WHERE userId=:userId and subscriptionId =:subscriptionId]]></db:sql>
 			<db:input-parameters ><![CDATA[#[{"userId": vars.userId,
-"subscription": vars.subscriptionId,
+"subscriptionId": vars.subscriptionId,
 "source": payload.source,
 "destination": payload.destination,
 "souceTime": payload.souceTime,
