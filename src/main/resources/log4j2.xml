@@ -15,6 +15,10 @@
             <SizeBasedTriggeringPolicy size="10 MB" />
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
+        <Http name="Splunk" url="<http://104.248.169.167:8088/services/collector/raw"> >
+        	<Property name="Authorization" value="Splunk 781bf734-6a3e-48d5-9847-250c3ff65d2f" ></Property>
+        	<PatternLayout pattern="[%d{MM-dd HH:mm:ss}] %-5p %c{1} [%t]: %m%n" ></PatternLayout>
+        </Http>
     </Appenders>
     <Loggers>
         
@@ -29,5 +33,9 @@
         <AsyncRoot level="INFO">
             <AppenderRef ref="file" />
         </AsyncRoot>
+         <AsyncRoot level="INFO">
+        <AppenderRef ref="file" />
+        <AppenderRef ref="Splunk" ></AppenderRef>
+    </AsyncRoot>
     </Loggers>
 </Configuration>

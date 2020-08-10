@@ -17,8 +17,76 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<db:my-sql-connection host="${mysql.host}" port="${mysql.port}" user="${mysql.user}" password="${mysql.password}" database="${mysql.database}" />
 	</db:config>
 	<configuration doc:name="Configuration" doc:id="506562d7-c518-4438-95c1-1e20a594e821" defaultErrorHandler-ref="trains-users-sys-api-globalConfigError_Handler" />
+	<error-handler name="trains-users-sys-api-globalConfigError_Handler1" doc:id="512710a6-ab3a-454f-8aae-c62029d743ef" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df31b70d-dbc3-4ae5-b891-214136b04e77" type="DB:BAD_SQL_SYNTAX" >
+			<ee:transform doc:name="Transform Message" doc:id="58075a07-5ebb-414d-89d9-74dcfa015000" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="9fcb6310-54f0-4e0a-97cd-14646c84d56e" config-ref="JSON_Logger_Config" message="#[payload]" />
+		</on-error-propagate>
+	</error-handler>
+	
+	
+	<error-handler name="trains-users-sys-api-globalConfigError_Handler2" doc:id="b12d6d85-a62e-4467-85ad-f46f702c9f80" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bd8af1a4-98d9-4a3f-9db8-5812a4bad2a1" type="DB:CONNECTIVITY">
+			<ee:transform doc:name="Transform Message" doc:id="5a8b2f94-85ac-40ce-a508-4af2cc98b1f1" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="56d26884-5401-47f6-9ee8-b5c88817cb2c" config-ref="JSON_Logger_Config" message="#[payload]" />
+		</on-error-propagate>
+		</error-handler >
+		
+	<error-handler name="trains-users-sys-api-globalConfigError_Handler3" doc:id="b43a9b25-c590-42fd-9770-558b31b69b92" >
+	<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d8c987cd-bbdb-48a0-89c5-01d74d9ae2f9" type="DB:QUERY_EXECUTION">
+			<ee:transform doc:name="Transform Message" doc:id="e0628637-5534-4201-bd64-a60a6b2cc2a6" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="8cb5ae62-cd46-44f2-a9bb-3a0fa3e2ef58" config-ref="JSON_Logger_Config" message="#[payload]" />
+		</on-error-propagate>
+	</error-handler >
+	
+	<error-handler name="trains-users-sys-api-globalConfigError_Handler4" doc:id="2e25e2a9-2952-4877-895a-1468a1aa5142" >
+	<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1fde481f-6be2-48b0-995d-9615aba7560c" type="DB:RETRY_EXHAUSTED">
+			<ee:transform doc:name="Transform Message" doc:id="ecf1c84a-2962-45c2-8ee4-f9f356269a2b" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="e18c2381-1351-4b82-a574-93c2f9c48b20" config-ref="JSON_Logger_Config" message="#[payload]" />
+		</on-error-propagate>
+	</error-handler>error-handler >
 	<error-handler name="trains-users-sys-api-globalConfigError_Handler" doc:id="35e2d4aa-8e13-4657-b507-62ddf1213dd0" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1a614589-234e-414d-b3ea-01ac5b1801e5" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1a614589-234e-414d-b3ea-01ac5b1801e5" type="ANY">
 			<ee:transform doc:name="Transform Message" doc:id="5343eaee-eb4c-4dd0-ad63-4fe8906a204a" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
