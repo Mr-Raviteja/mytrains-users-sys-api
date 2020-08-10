@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
 	<flow name="createUser" doc:id="7fd2f778-97a3-4432-8265-8e29322fb798" >
 		<db:insert doc:id="cf804610-77c3-4045-91a7-32b1c3bb5cdc" config-ref="Database_Config">
 			<db:sql ><![CDATA[INSERT INTO `trains`.`customers`
@@ -28,7 +29,7 @@ VALUES
 "email": payload.emailId,
 "phone": payload.phone}]]]></db:input-parameters>
 		</db:insert>
-		<logger level="INFO" doc:name="Logger" doc:id="bec0b992-b2e7-43dc-bd0f-8d8006c52680" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="5caa6f8d-afd7-46b5-b14a-7e759c90b95c" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE"/>
 	</flow>
 	<flow name="getAllUsers" doc:id="309d7fd4-ef82-4aad-b50e-10c625c9ddf9" >
 		<db:select doc:name="Select" doc:id="ff08506c-ad77-473d-af6c-04bd4250b504" config-ref="Database_Config">
@@ -49,7 +50,7 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="81e7959d-7070-4101-8eb9-145ad7390b50" message="#[payload]" />
+		<json-logger:logger doc:name="Logger" doc:id="e038d9d4-4cba-4fc0-ae97-8b9bd8afd5f7" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="getUserbyId" doc:id="ecdb8910-6ad4-420f-840e-57398d4cf96f" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set Variable" doc:id="394737c5-7b89-4a89-bd2c-8502d2832b42" variableName="userId" />
@@ -72,7 +73,7 @@ payload map ( payload01 , indexOfPayload01 ) -> {
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="852cb99f-a1fa-4a03-989d-61531bffbfc7" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="b6343eb9-fa0e-4a69-b5cf-7dc374ee277f" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="deleteUserById" doc:id="e93006b1-7abd-40fe-86f5-828591ab1e8b" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set Variable" doc:id="2c0ea8f5-4afd-4757-a5f0-9b7c5b4dfa51" variableName="userId" />
@@ -83,7 +84,7 @@ customerStatus=2
 where userId=:userId]]></db:sql>
 			<db:input-parameters ><![CDATA[#["userId": vars.userId]]]></db:input-parameters>
 		</db:update>
-		<logger level="INFO" doc:name="Logger" doc:id="9de28218-debb-4653-8108-d184f56ebb2b" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="367b9e39-9134-45d9-94b9-a4431ab7bec1" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="updateUserById" doc:id="48d761ca-eeb5-402a-b3a7-339b162e1e17">
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set Variable" doc:id="2aa28148-1e9f-4a61-8bf5-f402ce5e7e44" variableName="userId"/>
@@ -102,7 +103,7 @@ WHERE `userId` = :userId
 "emailId": payload.emailId,
 "phone": payload.phone}]]]></db:input-parameters>
 		</db:update>
-		<logger level="INFO" doc:name="Logger" doc:id="b9aad3bf-39e0-4be8-ab50-2e3df08f46a2" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="2f431d06-d7de-4a97-be12-a770daca4a62" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="deleteSubscription" doc:id="39e8bdbc-1f75-4f51-b0f3-a03b756a0550" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="bda84d86-9a7e-4b57-8640-74544c199ffb" variableName="userId" />
@@ -115,7 +116,7 @@ WHERE userId=:userId and subscriptionId=:subscriptionId]]></db:sql>
 "userId": vars.userId
 }]]]></db:input-parameters>
 		</db:update>
-		<logger level="INFO" doc:name="Logger" doc:id="5ccb9b47-1ca3-48ca-866f-66942b0f67b5" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="fabc3fa2-bda2-4b4e-86f3-03f98defa937" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="getAllSubscriptions" doc:id="84100ddc-10a9-4f8c-bd2b-616e8fe8bd6a" >
 		<db:select doc:name="Select" doc:id="a358b5f3-ee1b-4297-aff9-6a2250bfe33e" config-ref="Database_Config">
@@ -129,7 +130,7 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="7707fb40-fedc-4e51-a69e-058b7c39c179" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="1261a967-5a46-4222-9a10-55db6f828919" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="createSubscription" doc:id="4b648f93-b493-4906-af6b-b09e12c5ab47" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="244109b1-ade6-42e6-a9fe-32d8da311a8b" variableName="userId" />
@@ -155,7 +156,7 @@ VALUES
 "destinationTime": payload.destinationTime,
 "remainderTime": payload.remainderTime}]]]></db:input-parameters>
 		</db:insert>
-		<logger level="INFO" doc:name="Logger" doc:id="2b4b5628-62a7-45d1-b01c-82c90af6a879" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="204f10ff-e519-4c04-8814-3626461a0a13" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="getUserSubscription" doc:id="c57453e3-9642-4ef6-a75b-cdbc03eeac91" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="userId Variable" doc:id="338ca31d-4be2-41e0-bf16-ed6e8ec47620" variableName="userId" />
@@ -174,7 +175,7 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="540dfed3-eafb-47e3-98ac-5e094deada5b" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="700e72f5-0564-4d53-9dc7-a0744a66eb1b" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="getAllSubscriptionsByUser" doc:id="ca718835-f905-4dfb-b0d2-94777b4b1183" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="5d661014-9ca6-4243-b766-e48161c90595" variableName="userId" />
@@ -190,7 +191,7 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<logger level="INFO" doc:name="Logger" doc:id="005209f9-e66d-41f6-a4ef-a5836cb07c9a" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="d1f155cf-c41d-4584-a642-c2506d8819e1" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 	<flow name="updateSubscription" doc:id="8f5adbb4-fe6b-4827-9302-40160511790f" >
 		<set-variable value="#[message.attributes.uriParams.userId]" doc:name="Set userId Variable" doc:id="85be24fb-791e-4c61-9214-e43a9e181d5c" variableName="userId" />
@@ -212,6 +213,6 @@ WHERE userId=:userId and subscriptionId =:subscriptionId]]></db:sql>
 "destinationTime": payload.destinationTime,
 "reminderTime": payload.reminderTime}]]]></db:input-parameters>
 		</db:update>
-		<logger level="INFO" doc:name="Logger" doc:id="19d7f764-fa6c-4694-9290-2bf191e9e800" message="#[payload]"/>
+		<json-logger:logger doc:name="Logger" doc:id="354cc849-e540-403a-ac8e-f456839a3861" config-ref="JSON_Logger_Config" message="#[payload]" priority="TRACE" />
 	</flow>
 </mule>

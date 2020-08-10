@@ -1,16 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	  <http:listener-config name="trains-customer-sapi-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" />
     </http:listener-config>
+    <json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="48e08a12-b748-46fb-a1e1-0795d690f1dd" applicationName="mytrains-user-sapi" environment="dev" applicationVersion="1.0.0-SNAPSHOT"/>
 	<configuration-properties doc:name="Configuration properties" doc:id="21321051-9aa7-4c55-9f7c-e24ad648a12c" file="mytrains.user.sys.api.dev.yaml" />
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="96e6187e-13c3-48d7-b3cf-8605dca3ffc4" >
 		<db:my-sql-connection host="${mysql.host}" port="${mysql.port}" user="${mysql.user}" password="${mysql.password}" database="${mysql.database}" />
 	</db:config>
+	<configuration doc:name="Configuration" doc:id="506562d7-c518-4438-95c1-1e20a594e821" defaultErrorHandler-ref="trains-users-sys-api-globalConfigError_Handler" />
+	<error-handler name="trains-users-sys-api-globalConfigError_Handler" doc:id="35e2d4aa-8e13-4657-b507-62ddf1213dd0" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1a614589-234e-414d-b3ea-01ac5b1801e5" >
+			<ee:transform doc:name="Transform Message" doc:id="5343eaee-eb4c-4dd0-ad63-4fe8906a204a" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="5845ee6f-07a5-4042-b8ff-cb70cb8583da" config-ref="JSON_Logger_Config" message="#[payload]"/>
+		</on-error-propagate>
+	</error-handler>
 </mule>
