@@ -11,94 +11,103 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	  <http:listener-config name="trains-customer-sapi-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="8082" />
     </http:listener-config>
-    <json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="48e08a12-b748-46fb-a1e1-0795d690f1dd" applicationName="mytrains-user-sapi" environment="dev" applicationVersion="1.0.0-SNAPSHOT"/>
-	<configuration-properties doc:name="Configuration properties" doc:id="21321051-9aa7-4c55-9f7c-e24ad648a12c" file="mytrains.user.sys.api.dev.yaml" />
-	<db:config name="Database_Config" doc:name="Database Config" doc:id="96e6187e-13c3-48d7-b3cf-8605dca3ffc4" >
+    <json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="dc64551f-1299-4cd8-bddb-11abe70743e6" applicationName="mytrains-user-sapi" environment="dev" applicationVersion="1.0.0-SNAPSHOT"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="826ffd19-ad13-4299-bc3e-b3469ffff24b" file="mytrains.user.sys.api.dev.yaml" />
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="f567f7da-9b43-479e-a01f-7a82bd3b6f96" >
 		<db:my-sql-connection host="${mysql.host}" port="${mysql.port}" user="${mysql.user}" password="${mysql.password}" database="${mysql.database}" />
 	</db:config>
-	<configuration doc:name="Configuration" doc:id="506562d7-c518-4438-95c1-1e20a594e821" defaultErrorHandler-ref="trains-users-sys-api-globalConfigError_Handler" />
-	<error-handler name="trains-users-sys-api-globalConfigError_Handler1" doc:id="512710a6-ab3a-454f-8aae-c62029d743ef" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="df31b70d-dbc3-4ae5-b891-214136b04e77" type="DB:BAD_SQL_SYNTAX" >
-			<ee:transform doc:name="Transform Message" doc:id="58075a07-5ebb-414d-89d9-74dcfa015000" >
+	<configuration doc:name="Configuration" doc:id="5740b11f-523e-4c20-9d62-b5cf55370da7" defaultErrorHandler-ref="trains-users-sys-api-globalConfigError_Handler" />
+	<error-handler name="trains-users-sys-api-globalConfigError_Handler" doc:id="ab9c9f92-370d-4ae0-8d53-23ac9ac36e2c" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="fcd9a28d-823c-4915-b1c3-180b76ab7310" type="DB:BAD_SQL_SYNTAX" >
+			<ee:transform doc:name="Transform Message" doc:id="4fb9ed2e-0c63-4f78-95e3-3031ae89afa3" >
 				<ee:message >
 					<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
+output application/json
 ---
 {
 	error: error.errorType,
 	errorDesc: error.description
 }]]></ee:set-payload>
 				</ee:message>
-			</ee:transform>
-			<json-logger:logger doc:name="Logger" doc:id="9fcb6310-54f0-4e0a-97cd-14646c84d56e" config-ref="JSON_Logger_Config" message="#[payload]" />
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			
+</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="bd997a0e-ffc2-4d0f-9baa-1e9f28c60997" config-ref="JSON_Logger_Config" message="#['JSON Logger']" />
 		</on-error-propagate>
-	</error-handler>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="48a8b546-c6cd-4a06-b574-47837b1e8d24" type="DB:CONNECTIVITY">
+			<ee:transform doc:name="Transform Message" doc:id="c5492ac5-1c09-46f6-af3e-230b33540cae">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			
+</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="664ce66d-38b7-4d68-8a3b-4c7ac0d35baa" config-ref="JSON_Logger_Config" message="#['JSON Logger']" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="409c1bb7-3956-40a2-95dd-6b632d0dc19b" type="DB:QUERY_EXECUTION">
+			<ee:transform doc:name="Transform Message" doc:id="9ceae877-6645-4c99-bcab-bb55b4aef477">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			
+</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="5c0b02b4-65a7-495f-8b91-b4bbf0d418ac" config-ref="JSON_Logger_Config" message="#[payload]" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6f1c00f5-772e-4555-9b4d-bfcde8c43496" type="DB:RETRY_EXHAUSTED">
+			<ee:transform doc:name="Transform Message" doc:id="53917960-7743-4bc2-9d48-7749b50d71d6">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[408]]></ee:set-variable>
+				</ee:variables>
+			
+</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="3f7dc8b5-1ad5-444e-9422-c6961e53f7e9" config-ref="JSON_Logger_Config" message="#['JSON Logger']" />
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f29e9a6a-b961-4bb7-8b9b-edcf2b682db9" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="dd197ca7-ca23-4146-855e-239c890e1426">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	error: error.errorType,
+	errorDesc: error.description
+}]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[400]]></ee:set-variable>
+				</ee:variables>
+			
+</ee:transform>
+			<json-logger:logger doc:name="Logger" doc:id="47dba447-6665-46e8-bd36-adcc8839fe8f" config-ref="JSON_Logger_Config" message="#['JSON Logger']" />
+		</on-error-propagate>
 	
-	
-	<error-handler name="trains-users-sys-api-globalConfigError_Handler2" doc:id="b12d6d85-a62e-4467-85ad-f46f702c9f80" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="bd8af1a4-98d9-4a3f-9db8-5812a4bad2a1" type="DB:CONNECTIVITY">
-			<ee:transform doc:name="Transform Message" doc:id="5a8b2f94-85ac-40ce-a508-4af2cc98b1f1" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-	error: error.errorType,
-	errorDesc: error.description
-}]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<json-logger:logger doc:name="Logger" doc:id="56d26884-5401-47f6-9ee8-b5c88817cb2c" config-ref="JSON_Logger_Config" message="#[payload]" />
-		</on-error-propagate>
-		</error-handler >
-		
-	<error-handler name="trains-users-sys-api-globalConfigError_Handler3" doc:id="b43a9b25-c590-42fd-9770-558b31b69b92" >
-	<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d8c987cd-bbdb-48a0-89c5-01d74d9ae2f9" type="DB:QUERY_EXECUTION">
-			<ee:transform doc:name="Transform Message" doc:id="e0628637-5534-4201-bd64-a60a6b2cc2a6" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-	error: error.errorType,
-	errorDesc: error.description
-}]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<json-logger:logger doc:name="Logger" doc:id="8cb5ae62-cd46-44f2-a9bb-3a0fa3e2ef58" config-ref="JSON_Logger_Config" message="#[payload]" />
-		</on-error-propagate>
-	</error-handler >
-	
-	<error-handler name="trains-users-sys-api-globalConfigError_Handler4" doc:id="2e25e2a9-2952-4877-895a-1468a1aa5142" >
-	<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1fde481f-6be2-48b0-995d-9615aba7560c" type="DB:RETRY_EXHAUSTED">
-			<ee:transform doc:name="Transform Message" doc:id="ecf1c84a-2962-45c2-8ee4-f9f356269a2b" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-	error: error.errorType,
-	errorDesc: error.description
-}]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<json-logger:logger doc:name="Logger" doc:id="e18c2381-1351-4b82-a574-93c2f9c48b20" config-ref="JSON_Logger_Config" message="#[payload]" />
-		</on-error-propagate>
-	</error-handler>error-handler >
-	<error-handler name="trains-users-sys-api-globalConfigError_Handler" doc:id="35e2d4aa-8e13-4657-b507-62ddf1213dd0" >
-		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1a614589-234e-414d-b3ea-01ac5b1801e5" type="ANY">
-			<ee:transform doc:name="Transform Message" doc:id="5343eaee-eb4c-4dd0-ad63-4fe8906a204a" >
-				<ee:message >
-					<ee:set-payload ><![CDATA[%dw 2.0
-output application/java
----
-{
-	error: error.errorType,
-	errorDesc: error.description
-}]]></ee:set-payload>
-				</ee:message>
-			</ee:transform>
-			<json-logger:logger doc:name="Logger" doc:id="5845ee6f-07a5-4042-b8ff-cb70cb8583da" config-ref="JSON_Logger_Config" message="#[payload]"/>
-		</on-error-propagate>
-	</error-handler>
+</error-handler>
 </mule>

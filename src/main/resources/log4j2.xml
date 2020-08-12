@@ -15,7 +15,7 @@
             <SizeBasedTriggeringPolicy size="10 MB" />
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
-        <Http name="Splunk" url="<http://104.248.169.167:8088/services/collector/raw"> >
+        <Http name="Splunk" url="http://localhost:8088/services/collector/raw" >
         	<Property name="Authorization" value="Splunk 781bf734-6a3e-48d5-9847-250c3ff65d2f" ></Property>
         	<PatternLayout pattern="[%d{MM-dd HH:mm:ss}] %-5p %c{1} [%t]: %m%n" ></PatternLayout>
         </Http>
@@ -30,9 +30,9 @@
 		<!-- Mule logger -->        
         <AsyncLogger name="org.mule.runtime.core.internal.processor.LoggerMessageProcessor" level="INFO"/>
  
-        <AsyncRoot level="INFO">
+        <!-- <AsyncRoot level="INFO">
             <AppenderRef ref="file" />
-        </AsyncRoot>
+        </AsyncRoot> -->
          <AsyncRoot level="INFO">
         <AppenderRef ref="file" />
         <AppenderRef ref="Splunk" ></AppenderRef>
