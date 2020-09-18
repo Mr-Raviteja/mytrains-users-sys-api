@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="trains-users-sys-api-implementation-test-suite.xml" ignore="false"/>
+	<import doc:name="Import" doc:id="177ded27-f7c2-4252-a560-214cdbcab79d" file="trains-users-sys-api-globalConfig.xml" />
+	<configuration-properties doc:name="Configuration properties" doc:id="ec9e913d-886e-4e2c-8dfb-920d406a1904" file="mytrains.user.sys.api.test.yaml" />
+	<import doc:name="Import" doc:id="5d45ea87-aaad-41d8-84cc-29af9deea5ef" file="trains-users-sys-api-implementation.xml" />
+	<munit:test name="trains-users-sys-api-implementation-test-suite-getAllUsersTest" doc:id="e9a5616a-e2ee-4004-b612-b6d51571cadd" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="1573380f-07c3-4c2a-ac7a-f093c76c538c" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ff08506c-ad77-473d-af6c-04bd4250b504" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[
+%dw 2.0
+output application/java
+---
+[{
+  "customerId": "101",
+  "userId": "ddx",
+  "firstName": "Ravi",
+  "lastName": "Teja",
+  "emailId": "raviteja@gmail.com",
+  "phone": "07448772079"
+  },
+  {
+  "customerId": "101",
+   "userId": "ddx",
+  "firstName": "Ravi",
+  "lastName": "Teja",
+  "emailId": "raviteja@gmail.com",
+  "phone": "07448772079"
+  }
+]
+]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="83d55fd8-ecea-469e-990d-f9f282659477" />
+			<flow-ref doc:name="Flow-ref to getAllUsers" doc:id="172c3fdb-49a5-4994-86c0-c1f4c2b06a08" name="getAllUsers"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="e28f042f-b3d4-4e07-a3d6-31276882de49" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-createUserTest" doc:id="81c12126-0d73-41c2-b63c-288f83458b12" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="49e7ecfa-f960-4267-af06-72827bd57c0e" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="cf804610-77c3-4045-91a7-32b1c3bb5cdc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#["affectedRows":1]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="19394287-f8b1-4aa2-852a-c0ca392cf454" />
+			<set-payload value='#[{
+  "firstName": "sreeKanth",
+  "lastName": "Xyznvhg",
+  "email": "sreeKanth143@gmail.com",
+  "password": "Sreekanth143",
+  "phone": "07448772079" 
+}]' doc:name="Set Payload" doc:id="ed7f8376-abe0-4344-9e63-0f39b5132b4c" />
+			<flow-ref doc:name="Flow-ref to createUser" doc:id="3e2c93e9-3123-424c-aa66-604a9bac3b74" name="createUser"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="348368a2-521d-4dd7-9535-f1d4208a800f" actual="#[payload.affectedRows]" expected="#[1 as Number]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-getUserbyIdTest" doc:id="04a7af2e-d651-4bca-bc15-3f08fcff4c59" description="Test">
+		<munit:behavior>
+			<munit-tools:mock-when doc:name="Mock when" doc:id="cb6dcde8-2ce7-49db-8654-76cb01670390" processor="db:select" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="5f1b131b-f01f-4170-be39-4ec9a888e286" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[
+%dw 2.0
+output application/java
+---
+[{
+  "customerId": "101",
+  "userId": "ddx",
+  "firstName": "Ravi",
+  "lastName": "Teja",
+  "emailId": "raviteja@gmail.com",
+  "phone": "07448772079"
+  }
+]
+]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="80250a48-a98f-493f-9492-1c0bf3474d70" >
+				<munit:attributes value='#["uriParams":{
+	"userId":101}
+]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to getUserbyId" doc:id="6473a0b4-8491-4ea0-861e-8cae331a2291" name="getUserbyId"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="bdfd0ef6-043d-4b8d-a781-a275552a8a6b" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-deleteUserByIdTest" doc:id="b62fbfe0-6e3e-42cb-9849-21f3ab3a9324" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="eb2ff031-ba54-49c3-b306-147ac76b674f" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="2c9d46a2-2e3c-410b-98b7-6a7d97576ffc" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[
+{"affectedRows":1}
+]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="cf8928fd-45dd-4736-8790-66b012524396" >
+				<munit:attributes value='#["uriParams":{
+"userId":101}
+]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to deleteUserById" doc:id="0edbc8a5-236c-4cc8-b65d-e0d7fc543258" name="deleteUserById"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="2d0e08c6-1777-4f29-8ba7-fa99d3d8e0fe" actual="#[payload.affectedRows]" expected="#[1]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-updateUserByIdTest" doc:id="8e870a8e-9598-4de9-a7f7-770df05289dd" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="e5411801-adf5-4dc6-bffc-889256e08ec0" processor="db:update">
+				
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute whereValue="Update" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e2c80332-faa6-4de7-b8cf-652914d418d0" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#["affectedRows":1]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a8eafe96-5c5d-42ca-8e26-991c1fbff1d5" >
+				<munit:payload value='#[{
+  "customerId": "101",
+  "userId": "ddx",
+  "firstName": "Ravi",
+  "lastName": "Teja",
+  "emailId": "raviteja@gmail.com",
+  "phone": "07448772079"
+  }]' />
+				<munit:attributes value='#["uriParams":{
+"userId":101}]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to updateUserById" doc:id="cbd67f38-a051-4776-8640-7ca3cf98b0d9" name="updateUserById"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="7dd94551-a1b4-4cdd-8be7-9d6710b59afb" actual="#[payload.affectedRows]" expected="#[1]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-deleteSubscriptionTest" doc:id="a22fb820-e28c-42c1-9cbb-1e920ec7a378" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="be284944-514e-41ce-822e-a504ac4db311" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="7284aac5-8226-4246-bb01-d361cb03394e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#["affectedRows":1]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="513d3e32-7b44-4fb4-9f65-97483f0323fd" >
+				<munit:attributes value='#["uriParams":
+		{"userId":101,
+		 "subscriptionId":1
+			}
+	]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to deleteSubscription" doc:id="37dc22ef-77f7-45dd-82b0-1813cf46484e" name="deleteSubscription"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="74290fa5-6cb8-4e58-9a39-94b35a2deb7e" actual="#[payload.affectedRows]" expected="#[1]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-getAllSubscriptionsTest" doc:id="90fa91de-90e2-47c2-bd75-7638d609c969" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="22630650-8dcd-43d6-a2d4-479ba5dfe6fd" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="a358b5f3-ee1b-4297-aff9-6a2250bfe33e" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value=' #[%dw 2.0
+output application/java
+---
+ [
+    {
+  "subscription": "1254",
+  "userId": "12",
+  "source": "cambridge",
+  "destination": "Liverpool",
+  "sourceTime": "2016-02-28T12:41:41.090Z",
+  "destinationTime": "2016-02-28T16:41:41.090Z", 
+  "remainderTime": "00:30:00"
+   },
+  
+    {
+  "subscription": "1254",
+  "customerId": "12",
+  "source": "cambridge",
+  "destination": "Liverpool",
+  "sourceTime": "2016-02-28T12:41:41.090Z",
+  "destinationTime": "2016-02-28T16:41:41.090Z", 
+  "remainderTime": "00:30:00"
+    }
+  ]
+]
+  ' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="1ca84bea-c4dc-4b83-b9bd-e9784f9f8786" />
+			<flow-ref doc:name="Flow-ref to getAllSubscriptions" doc:id="607be38c-d3b1-43d9-881f-6fd7b144d05a" name="getAllSubscriptions"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="8f60c2fc-981d-4cb7-92b2-ba05ebe329c8" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-createSubscriptionTest" doc:id="d5401496-af97-45ba-a89b-3cf0254b09ec" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="98477de9-96d3-4a16-b974-dab0187269e7" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Insert" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="69b52d75-d8c1-40ec-bb5b-cef28680fc38" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#["affectedRows":1]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="a1ad6a91-8fca-402f-86c4-ca20b77d8617" >
+				<munit:payload value='#[ {
+    
+  "source": "cambridge",
+  "destination": "Liverpool",
+  "sourceTime": "2016-02-28T12:41:41.090Z",
+  "destinationTime": "2016-02-28T16:41:41.090Z", 
+  "remainderTime": "00:30:00"
+  }]' />
+				<munit:attributes value='#[
+"uriParams":{
+"userId":101}
+]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to createSubscription" doc:id="b77ed4d3-bc72-44b3-9e05-3d38c4664e6c" name="createSubscription"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="5f50c17a-9c47-48f6-a8ee-4266e6c67302" actual="#[payload.affectedRows]" expected="#[1]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-getUserSubscriptionTest" doc:id="61e15b57-324c-4866-8c8f-687e682ef23b" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="578dc470-5d80-4a71-8c83-1dcf0e26c6b7" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="47af6685-117b-4993-b288-324d8c218d69" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[   {
+  "subscription": "1254",
+  "customerId": "12",
+  "source": "cambridge",
+  "destination": "Liverpool",
+  "sourceTime": "2016-02-28T12:41:41.090Z",
+  "destinationTime": "2016-02-28T16:41:41.090Z", 
+  "remainderTime": "00:30:00"
+    }]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ac16114d-e5ef-4c2e-80b8-de55a023d457" >
+				<munit:attributes value='#[
+"uriParams":{
+"userId":101,
+"subscriptionId":1}
+]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to getUserSubscription" doc:id="d303aa07-e75c-4089-9ca6-4018ac306383" name="getUserSubscription"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6874f52b-d836-46b6-9fe9-75dfa73fc938" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-getAllSubscriptionsByUserTest" doc:id="0fab9cc4-e130-4493-a78b-8e9e275c31eb" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4f0c755e-9fdb-4580-a6fa-74e907cf0b9d" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Select" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="ea038e24-a523-4122-816f-62611ac568ee" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[[
+    {
+  "subscription": "1254",
+  "userId": "12",
+  "source": "cambridge",
+  "destination": "Liverpool",
+  "sourceTime": "2016-02-28T12:41:41.090Z",
+  "destinationTime": "2016-02-28T16:41:41.090Z", 
+  "remainderTime": "00:30:00"
+   },
+  
+    {
+  "subscription": "1254",
+  "customerId": "12",
+  "source": "cambridge",
+  "destination": "Liverpool",
+  "sourceTime": "2016-02-28T12:41:41.090Z",
+  "destinationTime": "2016-02-28T16:41:41.090Z", 
+  "remainderTime": "00:30:00"
+    }
+  ]]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="ee30ba1c-10b5-452a-8e1e-38860d07850d" >
+				<munit:attributes value='#[
+"uriParams":{
+"userId":101}
+]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to getAllSubscriptionsByUser" doc:id="1a074ed0-d102-4662-814c-5e287b5b5624" name="getAllSubscriptionsByUser"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="aac0810c-7709-4dfc-bfa3-0d8dcbcff00c" is="#[MunitTools::notNullValue()]" expression="#[payload]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="trains-users-sys-api-implementation-test-suite-updateSubscriptionTest" doc:id="0b964ce7-36d6-4b51-8ef3-fd1d7e740dc0" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="2920d1b9-0aa2-457a-a7bd-0337c3964781" processor="db:update">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Update" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="fa410cee-7f03-448e-83eb-0688ce410b9a" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#["affectedRows":1]' />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<munit:set-event doc:name="Set Event" doc:id="6ae6daef-fee3-497e-aef6-5a24fe1f8a97" >
+				<munit:attributes value='#[
+"uriParams":{
+"userId":101,
+"subscriptionId":12}
+]' />
+			</munit:set-event>
+			<flow-ref doc:name="Flow-ref to updateSubscription" doc:id="d627d1fe-6c74-4d65-ae79-649d651276ba" name="updateSubscription"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="6e26e5ce-19f4-49cc-8e1d-e42cc0ecd3d8" actual="#[payload.affectedRows]" expected="#[1]"/>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>
