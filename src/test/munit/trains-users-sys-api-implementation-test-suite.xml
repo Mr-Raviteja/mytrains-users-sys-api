@@ -75,7 +75,7 @@ output application/java
 			<flow-ref doc:name="Flow-ref to createUser" doc:id="3e2c93e9-3123-424c-aa66-604a9bac3b74" name="createUser"/>
 		</munit:execution>
 		<munit:validation>
-			<munit-tools:assert-equals doc:name="Assert equals" doc:id="348368a2-521d-4dd7-9535-f1d4208a800f" actual="#[payload.affectedRows]" expected="#[1 as Number]"/>
+			<munit-tools:assert-equals doc:name="Assert equals" doc:id="348368a2-521d-4dd7-9535-f1d4208a800f" actual='#["Data inserted successfully"]' expected='#["Data inserted successfully"]'/>
 		</munit:validation>
 	</munit:test>
 	<munit:test name="trains-users-sys-api-implementation-test-suite-getUserbyIdTest" doc:id="04a7af2e-d651-4bca-bc15-3f08fcff4c59" description="Test">

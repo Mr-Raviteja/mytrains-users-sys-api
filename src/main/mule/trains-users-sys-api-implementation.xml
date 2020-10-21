@@ -11,7 +11,7 @@ http://www.mulesoft.org/schema/mule/servicenow http://www.mulesoft.org/schema/mu
 		<servicenow:basic-connection username="admin" password="Madishetty@27" serviceAddress="https://dev70058.service-now.com/" />
 	</servicenow:config>
 	<flow name="createUser" doc:id="7fd2f778-97a3-4432-8265-8e29322fb798" >
-		<db:insert doc:id="cf804610-77c3-4045-91a7-32b1c3bb5cdc" config-ref="Database_Config">
+		<db:insert doc:id="cf804610-77c3-4045-91a7-32b1c3bb5cdc" config-ref="Database_Config" queryTimeout="5000">
 			<db:sql ><![CDATA[INSERT INTO `trains`.`customers`
 (`userId`,
 `firstName`,
@@ -34,6 +34,16 @@ VALUES
 "phone": payload.phone}]]]></db:input-parameters>
 		</db:insert>
 		<json-logger:logger doc:name="Logger" doc:id="5caa6f8d-afd7-46b5-b14a-7e759c90b95c" config-ref="JSON_Logger_Config" message="#['JSON Logger']" priority="TRACE" tracePoint="AFTER_REQUEST"/>
+		<ee:transform doc:name="Transform Message" doc:id="a6bfd642-86e3-4d04-a147-8640ed0afe21" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Data inserted successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
 	</flow>
 	<flow name="getAllUsers" doc:id="309d7fd4-ef82-4aad-b50e-10c625c9ddf9" >
 		<db:select doc:name="Select" doc:id="ff08506c-ad77-473d-af6c-04bd4250b504" config-ref="Database_Config">
